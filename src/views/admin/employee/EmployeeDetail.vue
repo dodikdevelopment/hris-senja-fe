@@ -43,14 +43,24 @@ const showDeleteModal = ref(false);
 
 // Load employee data
 const loadEmployee = async () => {
+  const employeeId = route.params.id as string;
+
   try {
-    const employeeId = route.params.id as string;
     employee.value = await employeeStore.fetchEmployee(employeeId);
-    // Load performance statistics
-    await employeeStore.fetchPerformanceStatistics(employeeId);
   } catch (error) {
+    // Hanya kegagalan mengambil data employee yang membuat halaman ini
+    // tidak ada gunanya, jadi hanya ini yang melempar user kembali.
     console.error("Error loading employee:", error);
     router.push({ name: "admin.employees" });
+    return;
+  }
+
+  // Statistik performa sifatnya pelengkap. Kalau gagal (mis. role tanpa izin),
+  // biarkan halaman tetap tampil dengan kartu statistik kosong.
+  try {
+    await employeeStore.fetchPerformanceStatistics(employeeId);
+  } catch (error) {
+    console.error("Error loading performance statistics:", error);
   }
 };
 
