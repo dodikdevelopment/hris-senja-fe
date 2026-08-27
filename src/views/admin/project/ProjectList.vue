@@ -81,7 +81,8 @@ const handlePerPageChange = (perPage) => {
       </div>
       <div class="flex items-center gap-4" v-if="can('project-create')">
         <button
-          class="bg-white border border-[#DCDEDD] text-brand-dark py-3 px-4 rounded-[8px] font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
+          v-coming-soon="'Import CSV proyek'"
+          class="bg-white border border-[#DCDEDD] text-brand-dark py-3 px-4 rounded-[8px] font-medium transition-colors flex items-center gap-2"
         >
           <Upload class="w-4 h-4" />
           <span class="text-sm font-semibold">Import CSV</span>
@@ -115,6 +116,7 @@ const handlePerPageChange = (perPage) => {
           />
         </div>
         <select
+          v-model="filters.status"
           class="px-4 py-3 border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 focus:border-[#0C51D9] focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
         >
           <option value="">All Status</option>

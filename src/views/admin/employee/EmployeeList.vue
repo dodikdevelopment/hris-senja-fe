@@ -5,6 +5,7 @@ import { useEmployeeStore } from "@/stores/employee";
 import { useOptionStore } from "@/stores/option";
 import { storeToRefs } from "pinia";
 import { ref, onMounted, watch } from "vue";
+import { useRoute } from "vue-router";
 import { debounce } from "lodash";
 import {
   Search,
@@ -32,10 +33,13 @@ const serverOptions = ref({
   row_per_page: 10,
 });
 
+const route = useRoute();
+
+// Filter awal bisa datang dari dashboard (SearchSection) lewat query string.
 const filters = ref({
-  search: null,
-  type: "",
-  status: "",
+  search: route.query.search ?? null,
+  type: route.query.type ?? "",
+  status: route.query.status ?? "",
 });
 
 const fetchData = async () => {
@@ -172,7 +176,8 @@ const handlePerPageChange = (perPage) => {
       </div>
       <div class="flex items-center gap-[10px]">
         <button
-          class="border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center gap-2"
+          v-coming-soon="'Import CSV karyawan'"
+          class="border border-[#DCDEDD] rounded-[8px] transition-all duration-300 px-4 py-3 flex items-center gap-2"
         >
           <Upload class="w-4 h-4 text-gray-600" />
           <span class="text-brand-dark text-sm font-semibold">Import CSV</span>

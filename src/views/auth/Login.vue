@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { useAuthStore } from "@/stores/auth";
 import { ref } from "vue";
 import Alert from "@/components/common/Alert.vue";
@@ -19,7 +19,7 @@ const handleSubmit = async () => {
   await login(form.value);
 
   if (error.value === "Unauthorized") {
-    form.value.password = null;
+    form.value.password = "";
   }
 };
 </script>
@@ -59,7 +59,7 @@ const handleSubmit = async () => {
       />
 
       <!-- Login Form -->
-      <form class="space-y-6">
+      <form class="space-y-6" @submit.prevent="handleSubmit">
         <!-- Email Field -->
         <Input
           id="email"
@@ -96,21 +96,23 @@ const handleSubmit = async () => {
         <div class="flex items-center justify-between">
           <div class="flex items-center">
             <input
+              v-coming-soon="'Remember me'"
               type="checkbox"
               id="remember"
               name="remember"
-              class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+              class="h-4 w-4 text-primary-600 border-gray-300 rounded"
             />
             <label for="remember" class="ml-2 text-gray-400">
               Remember me
             </label>
           </div>
-          <a
-            href="#"
-            class="hover:brightness-110 transition-all duration-300 text-primary-600"
+          <button
+            v-coming-soon="'Reset password'"
+            type="button"
+            class="transition-all duration-300 text-primary-600"
           >
             Forgot password?
-          </a>
+          </button>
         </div>
 
         <!-- Login Button -->
@@ -118,7 +120,6 @@ const handleSubmit = async () => {
           type="submit"
           class="btn-primary rounded-[8px] border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-[#0C51D9] transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2 w-full justify-center bg-gradient-to-l from-[#0c51d9] via-[#6f96e3] to-[#0c51d9] shadow-[inset_-2px_2px_1px_0_#6197ff,inset_2px_2px_1px_0_rgba(97,151,255,0.55)] text-white font-plus-jakarta-sans text-[14px] font-semibold cursor-pointer"
           :disabled="loading"
-          @click="handleSubmit"
         >
           Sign In to Dashboard
         </button>
@@ -132,7 +133,9 @@ const handleSubmit = async () => {
       <!-- Social Login -->
       <div class="grid grid-cols-2 gap-3">
         <button
-          class="border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 flex items-center justify-center gap-2 px-4 py-3 w-full"
+          v-coming-soon="'Login dengan Google'"
+          type="button"
+          class="border border-[#DCDEDD] rounded-[8px] transition-all duration-300 flex items-center justify-center gap-2 px-4 py-3 w-full"
         >
           <svg class="w-5 h-5 text-gray-400" viewBox="0 0 24 24">
             <path
@@ -158,7 +161,9 @@ const handleSubmit = async () => {
           >
         </button>
         <button
-          class="border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 flex items-center justify-center gap-2 px-4 py-3 w-full"
+          v-coming-soon="'Login dengan Facebook'"
+          type="button"
+          class="border border-[#DCDEDD] rounded-[8px] transition-all duration-300 flex items-center justify-center gap-2 px-4 py-3 w-full"
         >
           <svg
             class="w-5 h-5 text-gray-400"
@@ -182,12 +187,13 @@ const handleSubmit = async () => {
           class="text-[#6b7280] font-plus-jakarta-sans text-[14px] font-normal"
         >
           Don't have an account?
-          <a
-            href="#"
-            class="hover:brightness-110 transition-all duration-300 text-[#3b82f6] font-plus-jakarta-sans text-[14px] font-semibold"
+          <button
+            v-coming-soon="'Pendaftaran akun mandiri'"
+            type="button"
+            class="transition-all duration-300 text-[#3b82f6] font-plus-jakarta-sans text-[14px] font-semibold"
           >
             Sign up here
-          </a>
+          </button>
         </p>
       </div>
     </div>

@@ -1,10 +1,12 @@
-<script setup lang="ts">
+<script setup>
 import {
   UserPlusIcon,
   UsersIcon,
   BanknoteIcon,
   CalendarPlusIcon,
 } from "lucide-vue-next";
+import { RouterLink } from "vue-router";
+import { can } from "@/helpers/permissionHelper";
 </script>
 
 <template>
@@ -14,35 +16,42 @@ import {
   >
     <h3 class="text-brand-dark text-lg font-bold mb-4">Quick Actions</h3>
     <div class="space-y-3">
-      <button
+      <RouterLink
+        v-if="can('employee-create')"
+        :to="{ name: 'admin.employees.create' }"
         class="btn-secondary w-full text-left rounded-[12px] border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-[#0C51D9] transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3"
       >
         <UserPlusIcon class="w-4 h-4 text-white" />
         <span class="text-brand-white text-sm font-semibold"
           >Add Employee</span
         >
-      </button>
+      </RouterLink>
 
-      <button
+      <RouterLink
+        v-if="can('team-create')"
+        :to="{ name: 'admin.team.create' }"
         class="btn-secondary w-full text-left border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 hover:rounded-[12px] focus:border-[#0C51D9] focus:border-2 focus:rounded-[12px] focus:bg-white transition-all duration-300 px-4 py-3"
       >
         <UsersIcon class="w-4 h-4 text-gray-600" />
         <span class="text-brand-dark text-sm font-medium"
           >Create New Team</span
         >
-      </button>
+      </RouterLink>
 
-      <button
+      <RouterLink
+        v-if="can('payroll-create')"
+        :to="{ name: 'admin.payroll.create' }"
         class="btn-secondary w-full text-left border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 hover:rounded-[12px] focus:border-[#0C51D9] focus:border-2 focus:rounded-[12px] focus:bg-white transition-all duration-300 px-4 py-3"
       >
         <BanknoteIcon class="w-4 h-4 text-gray-600" />
         <span class="text-brand-dark text-sm font-medium"
           >Process Payroll</span
         >
-      </button>
+      </RouterLink>
 
       <button
-        class="btn-secondary w-full text-left border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 hover:rounded-[12px] focus:border-[#0C51D9] focus:border-2 focus:rounded-[12px] focus:bg-white transition-all duration-300 px-4 py-3"
+        v-coming-soon="'Jadwalkan meeting'"
+        class="btn-secondary w-full text-left border border-[#DCDEDD] rounded-[16px] transition-all duration-300 px-4 py-3"
       >
         <CalendarPlusIcon class="w-4 h-4 text-gray-600" />
         <span class="text-brand-dark text-sm font-medium"

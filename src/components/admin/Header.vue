@@ -13,7 +13,7 @@ import {
 } from "lucide-vue-next";
 import { useAuthStore } from "@/stores/auth";
 import { storeToRefs } from "pinia";
-import { ref, computed } from "vue";
+import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import { useRoute, RouterLink } from "vue-router";
 import _ from "lodash";
 
@@ -22,7 +22,28 @@ const { user } = storeToRefs(authStore);
 const { logout } = authStore;
 
 const isOpen = ref(false);
+const profileMenu = ref(null);
 const emit = defineEmits(["toggle-sidebar"]);
+
+const handleClickOutside = (e) => {
+  if (isOpen.value && profileMenu.value && !profileMenu.value.contains(e.target)) {
+    isOpen.value = false;
+  }
+};
+
+const handleEscape = (e) => {
+  if (e.key === "Escape") isOpen.value = false;
+};
+
+onMounted(() => {
+  document.addEventListener("click", handleClickOutside);
+  document.addEventListener("keydown", handleEscape);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener("click", handleClickOutside);
+  document.removeEventListener("keydown", handleEscape);
+});
 
 const route = useRoute();
 
@@ -164,17 +185,20 @@ const handleLogout = async () => {
         <!-- Action Buttons -->
         <div class="hidden sm:flex items-center gap-3">
           <button
-            class="w-10 h-10 rounded-full border border-[#DCDEDD] flex items-center justify-center hover:border-[#0C51D9] hover:border-2 transition-all duration-200"
+            v-coming-soon="'Notifikasi'"
+            class="w-10 h-10 rounded-full border border-[#DCDEDD] flex items-center justify-center transition-all duration-200"
           >
             <BellIcon class="w-5 h-5 text-gray-600" />
           </button>
           <button
-            class="w-10 h-10 rounded-full border border-[#DCDEDD] flex items-center justify-center hover:border-[#0C51D9] hover:border-2 transition-all duration-200"
+            v-coming-soon="'Pesan'"
+            class="w-10 h-10 rounded-full border border-[#DCDEDD] flex items-center justify-center transition-all duration-200"
           >
             <MessageCircleIcon class="w-5 h-5 text-gray-600" />
           </button>
           <button
-            class="w-10 h-10 rounded-full border border-[#DCDEDD] flex items-center justify-center hover:border-[#0C51D9] hover:border-2 transition-all duration-200"
+            v-coming-soon="'Pengaturan sistem'"
+            class="w-10 h-10 rounded-full border border-[#DCDEDD] flex items-center justify-center transition-all duration-200"
           >
             <SettingsIcon class="w-5 h-5 text-gray-600" />
           </button>
@@ -184,7 +208,7 @@ const handleLogout = async () => {
         <div class="hidden sm:block w-px h-8 bg-[#DCDEDD] mx-5"></div>
 
         <!-- User Profile -->
-        <div class="relative z-[10]">
+        <div class="relative z-[10]" ref="profileMenu">
           <div
             class="flex items-center gap-2 sm:gap-3 cursor-pointer"
             @click="isOpen = !isOpen"
@@ -241,20 +265,22 @@ const handleLogout = async () => {
                 <UserIcon class="w-4 h-4" />
                 Profil Pengguna
               </RouterLink>
-              <a
-                href="#"
-                class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
+              <button
+                v-coming-soon="'Pengaturan sistem'"
+                type="button"
+                class="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 transition-colors text-left"
               >
                 <SettingsIcon class="w-4 h-4" />
                 Pengaturan Sistem
-              </a>
-              <a
-                href="#"
-                class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
+              </button>
+              <button
+                v-coming-soon="'Halaman bantuan'"
+                type="button"
+                class="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 transition-colors text-left"
               >
                 <HelpCircleIcon class="w-4 h-4" />
                 Bantuan
-              </a>
+              </button>
             </div>
 
             <div class="border-t border-[#DCDEDD] py-1">

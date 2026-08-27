@@ -64,7 +64,8 @@ const props = defineProps({
           <span class="text-brand-white text-sm font-semibold">Edit Team</span>
         </RouterLink>
         <button
-          class="bg-white border border-[#DCDEDD] text-brand-dark py-3 px-6 rounded-[8px] font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
+          v-coming-soon="'Bagikan tim'"
+          class="bg-white border border-[#DCDEDD] text-brand-dark py-3 px-6 rounded-[8px] font-medium transition-colors flex items-center gap-2"
         >
           <Share class="w-4 h-4" />
           Share Team

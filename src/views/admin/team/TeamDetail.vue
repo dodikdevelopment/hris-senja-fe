@@ -267,19 +267,22 @@ watch(
         <!-- Action Buttons -->
         <div class="flex gap-2 mt-4 pt-4 border-t border-[#DCDEDD]">
           <button
-            class="flex-1 border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-3 py-2 flex items-center justify-center gap-2"
+            v-coming-soon="'Kirim pesan'"
+            class="flex-1 border border-[#DCDEDD] rounded-[8px] transition-all duration-300 px-3 py-2 flex items-center justify-center gap-2"
           >
             <MessageCircle class="w-5 h-5 text-brand-light" />
             <span class="text-brand-dark text-base font-semibold">Message</span>
           </button>
-          <button
+          <RouterLink
+            v-if="team?.leader?.employee_profile?.id"
+            :to="{ name: 'admin.employees.detail', params: { id: team.leader.employee_profile.id } }"
             class="flex-1 border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-3 py-2 flex items-center justify-center gap-2"
           >
             <UserCheck class="w-5 h-5 text-brand-light" />
             <span class="text-brand-dark text-base font-semibold"
               >View Profile</span
             >
-          </button>
+          </RouterLink>
         </div>
       </div>
 
@@ -388,7 +391,8 @@ watch(
       </div>
       <div class="flex items-center gap-4">
         <button
-          class="bg-white border border-[#DCDEDD] text-brand-dark py-3 px-4 rounded-[8px] font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
+          v-coming-soon="'Lihat semua anggota'"
+          class="bg-white border border-[#DCDEDD] text-brand-dark py-3 px-4 rounded-[8px] font-medium transition-colors flex items-center gap-2"
         >
           <Eye class="w-4 h-4" />
           <span class="text-sm font-semibold">View More</span>

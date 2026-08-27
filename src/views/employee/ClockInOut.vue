@@ -234,6 +234,18 @@ const startCamera = async () => {
   }
 };
 
+// Canvas menyimpan foto sebagai data URL; backend menerima file, jadi dikonversi
+// ke Blob sebelum dimasukkan ke FormData.
+const photoDataUrlToBlob = (dataUrl) => {
+  if (!dataUrl) return null;
+  const [header, base64] = dataUrl.split(',');
+  const mime = header.match(/:(.*?);/)?.[1] || 'image/jpeg';
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return new Blob([bytes], { type: mime });
+};
+
 const capturePhoto = () => {
   const video = document.getElementById("webcamPreview");
   const canvas = document.getElementById("photoCanvas");
@@ -271,6 +283,7 @@ const handleCheckIn = async () => {
     await checkIn({
       check_in_lat: currentLocation.value.latitude,
       check_in_long: currentLocation.value.longitude,
+      check_in_photo: photoDataUrlToBlob(capturedPhotoData.value),
     });
 
     alert("Successfully clocked in!");
@@ -292,6 +305,7 @@ const handleCheckOut = async () => {
     await checkOut({
       check_out_lat: currentLocation.value.latitude,
       check_out_long: currentLocation.value.longitude,
+      check_out_photo: photoDataUrlToBlob(capturedPhotoData.value),
     });
 
     alert("Successfully clocked out!");

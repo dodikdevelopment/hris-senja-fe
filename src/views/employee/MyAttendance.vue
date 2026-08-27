@@ -206,7 +206,8 @@ onMounted(async () => {
       <!-- Overlapped Action Buttons -->
       <div class="absolute bottom-4 right-6 flex items-center gap-[10px] z-20">
         <button
-          class="border border-[#DCDEDD] bg-white rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center gap-2 shadow-lg"
+          v-coming-soon="'Export laporan absensi'"
+          class="border border-[#DCDEDD] bg-white rounded-[8px] transition-all duration-300 px-4 py-3 flex items-center gap-2 shadow-lg"
         >
           <Download class="w-4 h-4 text-gray-600" />
           <span class="text-brand-dark text-sm font-semibold"

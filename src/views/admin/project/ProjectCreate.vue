@@ -29,7 +29,7 @@ import {
   Search,
   SearchX,
 } from "lucide-vue-next";
-import { onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { debounce } from "lodash";
 import { useProjectStore } from "@/stores/project";
 import { useTeamStore } from "@/stores/team";
@@ -88,6 +88,12 @@ const handleSubmit = async () => {
   }
 };
 
+const handleRemoveProjectPhoto = () => {
+  form.value.photo = "";
+  form.value.photo_url = "";
+  if (projectPhotoInput.value) projectPhotoInput.value.value = "";
+};
+
 const handleProjectPhotoSelect = (e) => {
   const file = e.target.files[0];
   if (file) {
@@ -105,6 +111,18 @@ const handleSelectLeader = (employee) => {
 const handleRemoveLeader = () => {
   selectedLeader.value = null;
   form.value.project_leader_id = "";
+};
+
+const selectedTeams = computed(() =>
+  teams.value.filter((team) => form.value.teams.includes(team.id))
+);
+
+const removeTeam = (id) => {
+  form.value.teams = form.value.teams.filter((teamId) => teamId !== id);
+};
+
+const clearAllTeams = () => {
+  form.value.teams = [];
 };
 
 onMounted(async () => {
@@ -222,6 +240,7 @@ watch(
                   />
                   <button
                     type="button"
+                    @click="projectPhotoInput.click()"
                     class="border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-4 py-2 flex items-center gap-2"
                   >
                     <ImagePlus class="w-4 h-4 text-gray-600" />
@@ -231,16 +250,9 @@ watch(
                   </button>
                   <button
                     type="button"
-                    class="hidden border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-4 py-2 flex items-center gap-2"
-                  >
-                    <Eye class="w-4 h-4 text-gray-600" />
-                    <span class="text-brand-dark text-base font-semibold"
-                      >Preview Photo</span
-                    >
-                  </button>
-                  <button
-                    type="button"
-                    class="border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-4 py-2 flex items-center gap-2"
+                    @click="handleRemoveProjectPhoto"
+                    :disabled="!form.photo_url"
+                    class="border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300 px-4 py-2 flex items-center gap-2"
                   >
                     <X class="w-4 h-4 text-gray-600" />
                     <span class="text-brand-dark text-base font-semibold"
@@ -614,7 +626,7 @@ watch(
             </div>
 
             <!-- Selected Teams Summary -->
-            <div id="selectedTeamsSummary" class="hidden">
+            <div v-if="selectedTeams.length">
               <div class="border-t border-[#DCDEDD] pt-4">
                 <div class="flex items-center justify-between mb-3">
                   <label class="block text-brand-dark text-base font-semibold"
@@ -622,13 +634,29 @@ watch(
                   >
                   <button
                     type="button"
-                    onclick="clearAllTeams()"
+                    @click="clearAllTeams"
                     class="text-brand-light text-sm hover:text-brand-dark transition-colors"
                   >
                     Clear All
                   </button>
                 </div>
-                <div id="selectedTeamsList" class="flex flex-wrap gap-2"></div>
+                <div class="flex flex-wrap gap-2">
+                  <span
+                    v-for="team in selectedTeams"
+                    :key="team.id"
+                    class="inline-flex items-center gap-2 rounded-full border border-[#DCDEDD] bg-white px-3 py-1 text-sm text-brand-dark"
+                  >
+                    {{ team.name }}
+                    <button
+                      type="button"
+                      @click="removeTeam(team.id)"
+                      class="text-brand-light hover:text-brand-dark transition-colors"
+                      :aria-label="`Remove ${team.name}`"
+                    >
+                      <X class="w-3.5 h-3.5" />
+                    </button>
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -830,7 +858,7 @@ watch(
           </button>
           <button
             type="button"
-            onclick="window.history.back()"
+            @click="router.back()"
             class="border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-6 py-3 flex items-center gap-2"
           >
             <span class="text-brand-dark text-base font-semibold">Cancel</span>

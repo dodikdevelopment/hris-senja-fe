@@ -20,7 +20,7 @@ onMounted(() => {
 });
 
 const goToEmployeeDetail = (id: number) => {
-  router.push({ name: "employee-detail", params: { id } });
+  router.push({ name: "admin.employees.detail", params: { id } });
 };
 </script>
 

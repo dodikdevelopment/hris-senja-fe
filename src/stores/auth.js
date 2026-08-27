@@ -6,14 +6,14 @@ import router from "@/router";
 
 export const useAuthStore = defineStore("auth", {
     state: () => ({
+        token: Cookies.get('token') || null,
         user: null,
         loading: false,
         error: null,
         success: null,
     }),
     getters: {
-        token: () => Cookies.get('token'),
-        isAuthenticated: (state) => !!state.user,
+        isAuthenticated: (state) => !!state.token && !!state.user,
     },
     actions: {
         async login(credentials) {
@@ -26,10 +26,13 @@ export const useAuthStore = defineStore("auth", {
                 const token = response.data.data.token
 
                 Cookies.set('token', token)
+                this.token = token
 
                 this.success = response.data.message
 
-                router.push({ name: 'admin.dashboard' })
+                await this.checkAuth()
+
+                await router.replace({ name: 'admin.dashboard' })
             } catch (error) {
                 this.error = handleError(error)
             } finally {
@@ -46,6 +49,8 @@ export const useAuthStore = defineStore("auth", {
             } catch (error) {
                 if (error.response && error.response.status === 401) {
                     Cookies.remove('token');
+                    this.token = null;
+                    this.user = null;
                     throw new Error("Unauthorized");
                 }
                 this.error = handleError(error);
@@ -62,10 +67,11 @@ export const useAuthStore = defineStore("auth", {
 
                 Cookies.remove('token')
 
+                this.token = null
                 this.user = null
                 this.error = null
 
-                router.push({ name: 'login' })
+                await router.replace({ name: 'login' })
             } catch (error) {
                 this.error = handleError(error)
             } finally {

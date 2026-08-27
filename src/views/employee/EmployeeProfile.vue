@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
+import { RouterLink } from "vue-router";
 import { useEmployeeStore } from "@/stores/employee";
+import { useTaskStore } from "@/stores/task";
 import { storeToRefs } from "pinia";
 import { getStatusColor, getLevelColor } from "@/utils/styleHelpers.js";
+import { getStatusBadgeClass } from "@/utils/badgeUtils.js";
 import { formatDateLong as formatDate } from "@/utils/dateUtils.js";
 import {
   formatRupiah as formatCurrency,
@@ -31,6 +34,8 @@ import {
 const employeeStore = useEmployeeStore();
 const { loading, performanceStatistics } = storeToRefs(employeeStore);
 
+const taskStore = useTaskStore();
+
 const profile = ref<any>(null);
 
 const loadProfile = async () => {
@@ -50,57 +55,21 @@ const skillLevelBadgeClass = computed(() => {
   return getLevelColor(capitalize(profile.value?.job_information?.skill_level));
 });
 
-// Dummy tasks
-const latestTasks = ref([
-  {
-    id: 1,
-    title: "API Integration for User Dashboard",
-    description: "Integrate REST APIs for the new user dashboard features...",
-    status: "In Progress",
-    statusClass: "bg-[#FEF3C7] text-[#D97706]",
-    dueDate: "Jan 30, 2024",
-    project: "Dashboard Project",
-  },
-  {
-    id: 2,
-    title: "Database Schema Optimization",
-    description: "Review and optimize database queries for improved...",
-    status: "Waiting",
-    statusClass: "bg-[#EBF8FF] text-[#1E40AF]",
-    dueDate: "Feb 5, 2024",
-    project: "Performance Project",
-  },
-  {
-    id: 3,
-    title: "Code Review for Payment Module",
-    description: "Review payment processing code and provide feedback on...",
-    status: "Completed",
-    statusClass: "bg-[#F0FDF4] text-[#166534]",
-    dueDate: "Completed: Jan 25, 2024",
-    project: "Payment Project",
-  },
-  {
-    id: 4,
-    title: "Unit Tests for Authentication",
-    description: "Write comprehensive unit tests for the new authentication...",
-    status: "In Progress",
-    statusClass: "bg-[#FEF3C7] text-[#D97706]",
-    dueDate: "Feb 1, 2024",
-    project: "Security Project",
-  },
-  {
-    id: 5,
-    title: "Documentation Update",
-    description: "Update technical documentation for the new feature...",
-    status: "Waiting",
-    statusClass: "bg-[#EBF8FF] text-[#1E40AF]",
-    dueDate: "Feb 8, 2024",
-    project: "Documentation Project",
-  },
-]);
+// Task yang di-assign ke user ini (difilter & diurutkan di backend).
+const latestTasks = computed(() =>
+  taskStore.myTasks.map((t) => ({
+    id: t.id,
+    title: t.name || "Task",
+    description: t.description || "Tidak ada deskripsi",
+    status: t.status,
+    dueDate: t.due_date ? formatDate(t.due_date) : "Tanpa tenggat",
+    project: t.project?.name || "-",
+  }))
+);
 
 onMounted(() => {
   loadProfile();
+  taskStore.fetchMyTasks({ limit: 5 });
 });
 </script>
 
@@ -166,7 +135,8 @@ onMounted(() => {
         </div>
         <div class="flex items-center">
           <button
-            class="btn-primary rounded-[8px] border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-[#0C51D9] transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
+            v-coming-soon="'Ajukan permintaan edit ke manager'"
+            class="btn-primary rounded-[8px] border border-[#2151A0] transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
           >
             <Edit class="w-4 h-4 text-white" />
             <span class="text-brand-white text-sm font-semibold"
@@ -521,14 +491,15 @@ onMounted(() => {
                 <p class="text-brand-light text-base">Team information</p>
               </div>
             </div>
-            <button
+            <RouterLink
+              :to="{ name: 'employee.team' }"
               class="border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-4 py-2 flex items-center gap-2"
             >
               <Users class="w-4 h-4 text-gray-600" />
               <span class="text-brand-dark text-sm font-semibold"
                 >View Team</span
               >
-            </button>
+            </RouterLink>
           </div>
 
           <!-- Team Header -->
@@ -600,12 +571,22 @@ onMounted(() => {
                 <p class="text-brand-light text-sm">Recently assigned tasks</p>
               </div>
             </div>
-            <button class="text-[#0C51D9] text-sm font-medium hover:underline">
+            <button
+              v-coming-soon="'Lihat semua task'"
+              class="text-[#0C51D9] text-sm font-medium"
+            >
               View All
             </button>
           </div>
 
-          <div class="space-y-4">
+          <div
+            v-if="!taskStore.loadingMyTasks && latestTasks.length === 0"
+            class="text-center py-8"
+          >
+            <p class="text-gray-500 text-sm">Belum ada task yang ditugaskan</p>
+          </div>
+
+          <div class="space-y-4" v-else>
             <div
               v-for="task in latestTasks"
               :key="task.id"
@@ -616,9 +597,9 @@ onMounted(() => {
                   {{ task.title }}
                 </h4>
                 <span
-                  :class="task.statusClass"
-                  class="px-2 py-1 rounded-md text-xs font-semibold flex-shrink-0"
-                  >{{ task.status }}</span
+                  :class="getStatusBadgeClass(task.status)"
+                  class="px-2 py-1 rounded-md text-xs font-semibold flex-shrink-0 capitalize"
+                  >{{ capitalize(task.status.replace("_", " ")) }}</span
                 >
               </div>
               <p class="text-brand-light text-sm mb-3">

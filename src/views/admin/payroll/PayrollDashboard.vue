@@ -154,19 +154,22 @@ const viewDetails = (id) => {
           </RouterLink>
 
           <button
-            class="btn-secondary w-full text-left border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 hover:rounded-[12px] focus:border-[#0C51D9] focus:border-2 focus:rounded-[12px] focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2">
+            v-coming-soon="'Generate laporan payroll'"
+                    class="btn-secondary w-full text-left border border-[#DCDEDD] rounded-[16px] transition-all duration-300 px-4 py-3 flex items-center gap-2">
             <FileText class="w-4 h-4 text-gray-600" />
             <span class="text-brand-dark text-sm font-medium">Generate Reports</span>
           </button>
 
           <button
-            class="btn-secondary w-full text-left border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 hover:rounded-[12px] focus:border-[#0C51D9] focus:border-2 focus:rounded-[12px] focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2">
+            v-coming-soon="'Export data payroll'"
+                    class="btn-secondary w-full text-left border border-[#DCDEDD] rounded-[16px] transition-all duration-300 px-4 py-3 flex items-center gap-2">
             <Download class="w-4 h-4 text-gray-600" />
             <span class="text-brand-dark text-sm font-medium">Export Data</span>
           </button>
 
           <button
-            class="btn-secondary w-full text-left border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 hover:rounded-[12px] focus:border-[#0C51D9] focus:border-2 focus:rounded-[12px] focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2">
+            v-coming-soon="'Pengaturan payroll'"
+                    class="btn-secondary w-full text-left border border-[#DCDEDD] rounded-[16px] transition-all duration-300 px-4 py-3 flex items-center gap-2">
             <Settings class="w-4 h-4 text-gray-600" />
             <span class="text-brand-dark text-sm font-medium">Payroll Settings</span>
           </button>

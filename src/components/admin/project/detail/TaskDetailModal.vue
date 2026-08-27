@@ -44,7 +44,28 @@ const { employees } = storeToRefs(employeeStore);
 const { fetchEmployees } = employeeStore;
 
 const taskStore = useTaskStore();
-const { updateTask, fetchProjectTasks } = taskStore;
+const { updateTask, fetchProjectTasks, fetchComments, addComment, deleteComment } =
+  taskStore;
+const { comments, loadingComments, savingComment } = storeToRefs(taskStore);
+
+const newComment = ref("");
+
+const handleAddComment = async () => {
+  const body = newComment.value.trim();
+  if (!body || !props.task?.id) return;
+
+  const created = await addComment(props.task.id, body);
+  if (created) newComment.value = "";
+};
+
+const handleDeleteComment = async (commentId) => {
+  if (confirm("Hapus komentar ini?")) {
+    await deleteComment(commentId);
+  }
+};
+
+const commentAuthorInitial = (comment) =>
+  (comment.user?.name || "?").charAt(0).toUpperCase();
 
 const assigneeDropdown = ref(false);
 const dueDateEditing = ref(false);
@@ -163,6 +184,16 @@ watch(
     });
   }, 300),
   { deep: true }
+);
+
+// Muat komentar setiap kali modal membuka task lain
+watch(
+  () => props.task?.id,
+  (taskId) => {
+    newComment.value = "";
+    if (taskId) fetchComments(taskId);
+  },
+  { immediate: true }
 );
 
 // Watch for task changes to update selected assignee
@@ -289,19 +320,78 @@ watch(
                     </h3>
                   </div>
                   <div class="space-y-3">
+                    <!-- Daftar komentar -->
+                    <p
+                      v-if="loadingComments"
+                      class="text-sm text-gray-400"
+                    >
+                      Memuat komentar...
+                    </p>
+                    <p
+                      v-else-if="comments.length === 0"
+                      class="text-sm text-gray-400"
+                    >
+                      Belum ada komentar.
+                    </p>
+
+                    <div
+                      v-for="comment in comments"
+                      :key="comment.id"
+                      class="flex gap-3 group"
+                    >
+                      <div
+                        class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0"
+                      >
+                        {{ commentAuthorInitial(comment) }}
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2">
+                          <span class="text-sm font-semibold text-gray-700">
+                            {{ comment.user?.name || "Pengguna" }}
+                          </span>
+                          <span class="text-xs text-gray-400">
+                            {{ formatDate(comment.created_at) }}
+                          </span>
+                          <button
+                            v-if="comment.is_mine"
+                            type="button"
+                            @click="handleDeleteComment(comment.id)"
+                            class="ml-auto text-xs text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            Hapus
+                          </button>
+                        </div>
+                        <p
+                          class="text-sm text-gray-600 whitespace-pre-line break-words"
+                        >
+                          {{ comment.body }}
+                        </p>
+                      </div>
+                    </div>
+
                     <!-- Comment Input -->
-                    <div class="flex gap-3">
+                    <form class="flex gap-3 pt-2" @submit.prevent="handleAddComment">
                       <div
                         class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0"
                       >
                         U
                       </div>
-                      <textarea
-                        class="flex-1 border border-gray-200 rounded-lg p-3 text-sm resize-none focus:border-[#0C51D9] focus:ring-2 focus:ring-[#0C51D9] focus:ring-opacity-20 transition-all"
-                        placeholder="Write a comment..."
-                        rows="3"
-                      ></textarea>
-                    </div>
+                      <div class="flex-1">
+                        <textarea
+                          v-model="newComment"
+                          class="w-full border border-gray-200 rounded-lg p-3 text-sm resize-none focus:border-[#0C51D9] focus:ring-2 focus:ring-[#0C51D9] focus:ring-opacity-20 transition-all"
+                          placeholder="Write a comment..."
+                          rows="3"
+                        ></textarea>
+                        <button
+                          type="submit"
+                          :disabled="savingComment || !newComment.trim()"
+                          class="mt-2 px-4 py-2 bg-[#0C51D9] hover:bg-[#0a42b3] disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-colors"
+                        >
+                          {{ savingComment ? "Mengirim..." : "Kirim" }}
+                        </button>
+                      </div>
+                    </form>
                   </div>
                 </div>
 
@@ -314,7 +404,8 @@ watch(
                     </h3>
                   </div>
                   <button
-                    class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium text-gray-700 transition-colors"
+                    v-coming-soon="'Lampiran task'"
+                    class="px-4 py-2 bg-gray-100 rounded-lg text-sm font-medium text-gray-700 transition-colors"
                   >
                     Add an attachment
                   </button>
@@ -526,12 +617,14 @@ watch(
                   </h3>
                   <div class="space-y-2">
                     <button
-                      class="w-full px-4 py-2 bg-[#0C51D9] hover:bg-[#0a42b3] text-white rounded-lg text-sm font-medium transition-colors"
+                      v-coming-soon="'Edit task'"
+                      class="w-full px-4 py-2 bg-[#0C51D9] text-white rounded-lg text-sm font-medium transition-colors"
                     >
                       Edit Task
                     </button>
                     <button
-                      class="w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors"
+                      v-coming-soon="'Pindahkan task'"
+                      class="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium transition-colors"
                     >
                       Move to...
                     </button>

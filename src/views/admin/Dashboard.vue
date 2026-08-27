@@ -1,6 +1,7 @@
-<script setup lang="ts">
+<script setup>
 import { computed } from "vue";
 import { useAuthStore } from "@/stores/auth";
+import { can } from "@/helpers/permissionHelper";
 import Statistics from "@/components/admin/dashboard/Statistics.vue";
 import EmployeeStatistics from "@/components/admin/dashboard/EmployeeStatistics.vue";
 import SearchSection from "@/components/admin/dashboard/SearchSection.vue";
@@ -11,15 +12,11 @@ const authStore = useAuthStore();
 
 // Check if user is employee role
 const isEmployee = computed(() => {
-  return authStore.user?.roles?.some((role: any) => role === "employee");
+  return authStore.user?.roles?.some((role) => role === "employee");
 });
 
 // Check if user has dashboard view permission
-const hasDashboardPermission = computed(() => {
-  return authStore.user?.permissions?.some(
-    (permission: any) => permission.name === "dashboard-view"
-  );
-});
+const hasDashboardPermission = computed(() => can("dashboard-view"));
 </script>
 
 <template>

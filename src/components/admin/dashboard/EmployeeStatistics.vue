@@ -7,18 +7,14 @@ import {
   ClockIcon,
   TrendingUpIcon,
   StarIcon,
-  AlertCircle,
-  CheckCircle2,
-  Clock3,
   Calendar,
-  Users,
-  MessageSquare,
 } from "lucide-vue-next";
 import QuickActions from "./QuickActions.vue";
+import Alert from "@/components/common/Alert.vue";
 import { useAuthStore } from "@/stores/auth";
 import { axiosInstance } from "@/plugins/axios";
+import { handleError } from "@/helpers/errorHelper";
 import { useTaskStore } from "@/stores/task";
-import { useEmployeeStore } from "@/stores/employee";
 
 const authStore = useAuthStore();
 
@@ -40,9 +36,8 @@ const statistics = ref({
 });
 
 const taskStore = useTaskStore();
-const employeeStore = useEmployeeStore();
 const upcomingTasks = computed(() => {
-  return taskStore.tasks.map((t: any) => ({
+  return taskStore.myTasks.map((t: any) => ({
     id: t.id,
     title: t.title || t.name || "Task",
     project: t.project?.name || t.project_name || "-",
@@ -52,43 +47,8 @@ const upcomingTasks = computed(() => {
   }));
 });
 
-// Dummy recent activities
-const recentActivities = ref([
-  {
-    id: 1,
-    type: "task_completed",
-    title: "Completed task: User Authentication Flow",
-    time: "2 hours ago",
-    icon: CheckCircle2,
-    color: "text-green-600",
-  },
-  {
-    id: 2,
-    type: "comment",
-    title: "Commented on PR: Add dark mode support",
-    time: "4 hours ago",
-    icon: MessageSquare,
-    color: "text-blue-600",
-  },
-  {
-    id: 3,
-    type: "check_in",
-    title: "Checked in at 08:30 AM",
-    time: "6 hours ago",
-    icon: Clock3,
-    color: "text-purple-600",
-  },
-  {
-    id: 4,
-    type: "meeting",
-    title: "Attended Sprint Planning Meeting",
-    time: "Yesterday",
-    icon: Users,
-    color: "text-orange-600",
-  },
-]);
-
 const loading = ref(false);
+const error = ref(null);
 const userName = computed(() => authStore.user?.name || "Employee");
 const currentDayOfMonth = computed(() => new Date().getDate());
 const onTimePercentage = computed(() => {
@@ -160,8 +120,13 @@ const fetchMyStatistics = async () => {
       tasks_review: tasks.review ?? 0,
       assigned_active_projects: projects.assigned_active ?? 0,
       led_active_projects: projects.led_active ?? 0,
+      // Belum dikirim backend (DashboardRepository::getEmployeeStatistics).
+      // Tetap dipetakan agar tidak diam-diam jadi undefined saat statistics ditimpa.
+      total_hours_worked: attendance.total_hours_worked ?? null,
+      leave_balance: attendance.leave_balance ?? null,
     };
-  } catch (error) {
+  } catch (err) {
+    error.value = handleError(err);
   } finally {
     loading.value = false;
   }
@@ -169,22 +134,20 @@ const fetchMyStatistics = async () => {
 
 onMounted(() => {
   fetchMyStatistics();
-  employeeStore
-    .fetchMyTeamProjects()
-    .then((projects: any[]) => {
-      const firstProjectId =
-        Array.isArray(projects) && projects.length ? projects[0].id : null;
-      if (firstProjectId) {
-        return taskStore.fetchProjectTasks(firstProjectId);
-      }
-    })
-    .catch(() => {});
+  taskStore.fetchMyTasks({ limit: 5 });
 });
 </script>
 
 <template>
   <!-- Employee Stats Layout -->
   <div class="mb-6">
+    <Alert
+      type="danger"
+      title="Gagal memuat statistik"
+      message="Data di bawah mungkin tidak akurat. Coba muat ulang halaman."
+      :show="!!error"
+    />
+
     <!-- Welcome Message -->
     <div class="mb-4">
       <h2 class="text-brand-dark text-xl sm:text-2xl font-bold">
@@ -266,12 +229,30 @@ onMounted(() => {
             <p class="text-brand-dark text-sm font-medium">Hours Worked</p>
             <p
               class="text-brand-dark text-2xl sm:text-3xl font-extrabold leading-tight my-2"
+              :class="{ 'text-gray-300': !loading && statistics.total_hours_worked == null }"
             >
               {{
-                loading ? "..." : (statistics.total_hours_worked ?? "-") + "h"
+                loading
+                  ? "..."
+                  : statistics.total_hours_worked == null
+                  ? "—"
+                  : statistics.total_hours_worked + "h"
               }}
             </p>
-            <p class="text-success text-sm font-medium">This month</p>
+            <p
+              class="text-sm font-medium"
+              :class="
+                statistics.total_hours_worked == null
+                  ? 'text-gray-400'
+                  : 'text-success'
+              "
+            >
+              {{
+                statistics.total_hours_worked == null
+                  ? "Belum tersedia"
+                  : "This month"
+              }}
+            </p>
           </div>
           <div
             class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 rounded-[16px] flex items-center justify-center"
@@ -290,10 +271,24 @@ onMounted(() => {
             <p class="text-brand-dark text-sm font-medium">Leave Balance</p>
             <p
               class="text-brand-dark text-2xl sm:text-3xl font-extrabold leading-tight my-2"
+              :class="{ 'text-gray-300': !loading && statistics.leave_balance == null }"
             >
-              {{ loading ? "..." : statistics.leave_balance ?? "-" }}
+              {{ loading ? "..." : statistics.leave_balance ?? "—" }}
             </p>
-            <p class="text-gray-500 text-sm font-medium">Days remaining</p>
+            <p
+              class="text-sm font-medium"
+              :class="
+                statistics.leave_balance == null
+                  ? 'text-gray-400'
+                  : 'text-gray-500'
+              "
+            >
+              {{
+                statistics.leave_balance == null
+                  ? "Belum tersedia"
+                  : "Days remaining"
+              }}
+            </p>
           </div>
           <div
             class="w-10 h-10 sm:w-12 sm:h-12 bg-green-50 rounded-[16px] flex items-center justify-center"
@@ -366,14 +361,23 @@ onMounted(() => {
         <h3 class="text-brand-dark text-base sm:text-lg font-bold">
           Upcoming Tasks
         </h3>
-        <a
-          href="#"
-          class="text-[#0C51D9] text-xs sm:text-sm font-medium hover:underline"
-          >View All</a
+        <button
+          v-coming-soon="'Lihat semua'"
+          type="button"
+          class="text-[#0C51D9] text-xs sm:text-sm font-medium"
         >
+          View All
+        </button>
       </div>
 
-      <div class="space-y-3">
+      <div
+        v-if="!taskStore.loadingMyTasks && upcomingTasks.length === 0"
+        class="text-center py-8"
+      >
+        <p class="text-gray-500 text-sm">Tidak ada task yang ditugaskan</p>
+      </div>
+
+      <div class="space-y-3" v-else>
         <div
           v-for="task in upcomingTasks"
           :key="task.id"
@@ -409,45 +413,10 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- Recent Activities -->
-    <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-4 sm:p-6">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-brand-dark text-base sm:text-lg font-bold">
-          Recent Activities
-        </h3>
-        <a
-          href="#"
-          class="text-[#0C51D9] text-xs sm:text-sm font-medium hover:underline"
-          >View All</a
-        >
-      </div>
-
-      <div class="space-y-4">
-        <div
-          v-for="activity in recentActivities"
-          :key="activity.id"
-          class="flex items-start gap-3"
-        >
-          <div
-            :class="`${activity.color
-              .replace('text-', 'bg-')
-              .replace('600', '50')}`"
-            class="w-10 h-10 rounded-[12px] flex items-center justify-center flex-shrink-0"
-          >
-            <component
-              :is="activity.icon"
-              :class="activity.color"
-              class="w-5 h-5"
-            />
-          </div>
-          <div class="flex-1 min-w-0">
-            <p class="text-brand-dark text-sm font-medium">
-              {{ activity.title }}
-            </p>
-            <p class="text-gray-500 text-xs">{{ activity.time }}</p>
-          </div>
-        </div>
-      </div>
-    </div>
+    <!--
+      Recent Activities disembunyikan: sebelumnya menampilkan 4 aktivitas
+      hardcoded. Aktifkan lagi setelah endpoint activity log tersedia
+      di hris-api-main.
+    -->
   </div>
 </template>

@@ -20,7 +20,7 @@ export default [
         component: ProjectCreate
     },
     {
-        path: '/admin/projects/:id',
+        path: '/admin/projects/:id/edit',
         name: 'admin.projects.edit',
         component: ProjectEdit
     }

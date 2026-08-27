@@ -74,13 +74,17 @@ export const useAttendanceStore = defineStore("attendance", {
             this.error = null;
 
             try {
-                const data = {
-                    check_in_lat: payload.check_in_lat,
-                    check_in_long: payload.check_in_long,
-                };
+                // FormData karena foto selfie ikut dikirim sebagai file.
+                const data = new FormData();
+                data.append('check_in_lat', payload.check_in_lat);
+                data.append('check_in_long', payload.check_in_long);
 
                 if (payload.notes) {
-                    data.notes = payload.notes;
+                    data.append('notes', payload.notes);
+                }
+
+                if (payload.check_in_photo) {
+                    data.append('check_in_photo', payload.check_in_photo, 'check-in.jpg');
                 }
 
                 const response = await axiosInstance.post('attendances/check-in', data);
@@ -102,13 +106,16 @@ export const useAttendanceStore = defineStore("attendance", {
             this.error = null;
 
             try {
-                const data = {
-                    check_out_lat: payload.check_out_lat,
-                    check_out_long: payload.check_out_long,
-                };
+                const data = new FormData();
+                data.append('check_out_lat', payload.check_out_lat);
+                data.append('check_out_long', payload.check_out_long);
 
                 if (payload.notes) {
-                    data.notes = payload.notes;
+                    data.append('notes', payload.notes);
+                }
+
+                if (payload.check_out_photo) {
+                    data.append('check_out_photo', payload.check_out_photo, 'check-out.jpg');
                 }
 
                 const response = await axiosInstance.post('attendances/check-out', data);

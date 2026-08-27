@@ -77,15 +77,7 @@ const shareProfile = () => {
   alert("Profile link copied to clipboard!");
 };
 
-const backupEmployee = () => {
-  if (
-    confirm(
-      `Create backup for ${employee.value?.user?.name}? This will download all employee data.`
-    )
-  ) {
-    alert("Backup feature will be implemented soon.");
-  }
-};
+
 
 const handleDeleteEmployee = async () => {
   try {
@@ -685,8 +677,8 @@ onMounted(() => {
         </div>
         <div class="flex gap-3">
           <button
-            @click="backupEmployee"
-            class="bg-white border border-[#DCDEDD] text-brand-dark py-3 px-6 rounded-[8px] font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
+            v-coming-soon="'Backup data karyawan'"
+            class="bg-white border border-[#DCDEDD] text-brand-dark py-3 px-6 rounded-[8px] font-medium transition-colors flex items-center gap-2"
           >
             <Download class="w-4 h-4" />
             Backup Data

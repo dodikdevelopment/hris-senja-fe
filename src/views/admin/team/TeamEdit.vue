@@ -90,6 +90,12 @@ const handleSubmit = async () => {
   }
 };
 
+const handleRemoveTeamIcon = () => {
+  form.value.icon = "";
+  form.value.icon_url = "";
+  if (teamIconInput.value) teamIconInput.value.value = "";
+};
+
 const handleTeamIconSelect = (e) => {
   const file = e.target.files[0];
 
@@ -233,7 +239,9 @@ watch(
                   </button>
                   <button
                     type="button"
-                    class="border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-4 py-2 flex items-center gap-2 cursor-pointer"
+                    @click="handleRemoveTeamIcon"
+                    :disabled="!form.icon_url"
+                    class="border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300 px-4 py-2 flex items-center gap-2 cursor-pointer"
                   >
                     <X class="w-4 h-4 text-gray-600" />
                     <span class="text-brand-dark text-base font-semibold"
@@ -665,7 +673,7 @@ watch(
           </button>
           <button
             type="button"
-            onclick="window.history.back()"
+            @click="router.back()"
             class="border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-6 py-3 flex items-center gap-2"
           >
             <span class="text-brand-dark text-base font-semibold">Cancel</span>

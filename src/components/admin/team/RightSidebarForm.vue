@@ -107,7 +107,8 @@ import { BookOpen, Check, Lightbulb, Users, Zap, Copy } from "lucide-vue-next";
 
       <div class="space-y-3">
         <button
-          class="w-full border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center gap-3 text-left"
+          v-coming-soon="'Browse karyawan'"
+            class="w-full border border-[#DCDEDD] rounded-[12px] transition-all duration-300 px-4 py-3 flex items-center gap-3 text-left"
         >
           <Users class="w-5 h-5 text-gray-600" />
           <div class="flex-1">
@@ -119,7 +120,8 @@ import { BookOpen, Check, Lightbulb, Users, Zap, Copy } from "lucide-vue-next";
         </button>
 
         <button
-          class="w-full border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center gap-3 text-left"
+          v-coming-soon="'Salin tim yang ada'"
+            class="w-full border border-[#DCDEDD] rounded-[12px] transition-all duration-300 px-4 py-3 flex items-center gap-3 text-left"
         >
           <Copy class="w-5 h-5 text-gray-600" />
           <div class="flex-1">
@@ -131,7 +133,8 @@ import { BookOpen, Check, Lightbulb, Users, Zap, Copy } from "lucide-vue-next";
         </button>
 
         <button
-          class="w-full border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center gap-3 text-left"
+          v-coming-soon="'Panduan setup tim'"
+            class="w-full border border-[#DCDEDD] rounded-[12px] transition-all duration-300 px-4 py-3 flex items-center gap-3 text-left"
         >
           <BookOpen class="w-5 h-5 text-gray-600" />
           <div class="flex-1">

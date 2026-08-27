@@ -178,10 +178,6 @@ const exportExcel = async () => {
   }
 };
 
-const sendNotifications = () => {
-  alert("Notifications sent successfully!");
-};
-
 const openMarkAsPaidModal = () => {
   paymentDate.value = new Date().toISOString().split("T")[0];
   showMarkAsPaidModal.value = true;
@@ -484,7 +480,7 @@ const handleMarkAsPaid = async () => {
             <span class="text-green-700 text-sm font-semibold">Mark as Paid</span>
           </button>
 
-          <button v-else @click="sendNotifications"
+          <button v-else v-coming-soon="'Kirim notifikasi slip gaji'"
             class="btn-primary rounded-[12px] border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-[#0C51D9] transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-2 flex items-center gap-2">
             <Send class="w-4 h-4 text-white" />
             <span class="text-brand-white text-sm font-semibold">Send Notifications</span>

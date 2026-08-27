@@ -345,23 +345,23 @@ const onNavigate = () => emit("navigate");
       <div>
         <h3 class="section-title">OTHERS</h3>
         <div class="space-y-3">
-          <a
-            href="#"
-            class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
-            @click="onNavigate"
+          <button
+            v-coming-soon="'Halaman Reports'"
+            type="button"
+            class="nav-link w-full border border-[#DCDEDD] rounded-[20px] transition-all duration-300"
           >
             <FileTextIcon class="w-5 h-5 text-gray-600" />
             <span class="text-brand-dark text-base font-medium">Reports</span>
-          </a>
+          </button>
 
-          <a
-            href="#"
-            class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
-            @click="onNavigate"
+          <button
+            v-coming-soon="'Halaman Settings'"
+            type="button"
+            class="nav-link w-full border border-[#DCDEDD] rounded-[20px] transition-all duration-300"
           >
             <SettingsIcon class="w-5 h-5 text-gray-600" />
             <span class="text-brand-dark text-base font-medium">Settings</span>
-          </a>
+          </button>
         </div>
       </div>
     </nav>
@@ -402,7 +402,8 @@ const onNavigate = () => emit("navigate");
 
           <!-- CTA Button -->
           <button
-            class="btn-primary w-full rounded-[8px] border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-[#0C51D9] transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3"
+            v-coming-soon="'Upgrade ke Pro'"
+            class="btn-primary w-full rounded-[8px] border border-[#2151A0] transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3"
           >
             <span class="text-brand-white text-sm font-semibold"
               >Upgrade Now</span
